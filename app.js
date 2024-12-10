@@ -1,24 +1,40 @@
+// Import required modules
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 
+// Initialize the app
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
-let slots = Array(6).fill({ isOccupied: false, carOwner: null, timings: null });
+// Middleware
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(express.json()); // Parse JSON request bodies
 
-// Get all parking slots
-app.get('/slots', (req, res) => {
-  res.json(slots);
+// Example route for testing
+app.get('/', (req, res) => {
+    res.send('Parking App Backend is Running!');
 });
 
-// Update a specific slot
-app.post('/update-slot', (req, res) => {
-  const { slotIndex, carOwner, timings } = req.body;
-  slots[slotIndex] = { isOccupied: true, carOwner, timings };
-  res.json({ message: 'Slot updated successfully', slots });
+// API route to handle parking data (example)
+app.post('/api/parking', (req, res) => {
+    const { slotNumber, timing } = req.body;
+
+    if (!slotNumber || !timing) {
+        return res.status(400).json({ message: 'Slot number and timing are required.' });
+    }
+
+    // Example response (In real-world, you'd save this data to a database)
+    res.status(200).json({ message: 'Parking data received.', data: { slotNumber, timing } });
+});
+
+// Handle errors
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ message: 'Something went wrong!' });
 });
 
 // Start the server
-app.listen(5000, () => console.log('Server running on port 5000'));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
